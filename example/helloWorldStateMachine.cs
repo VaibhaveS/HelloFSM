@@ -17,7 +17,6 @@ public class HelloWorldStateMachine : FiniteStateMachine
         Start,
         Greet,
         Ignore,
-
         Finish
     }
 
@@ -45,5 +44,21 @@ public class HelloWorldStateMachine : FiniteStateMachine
         {
             outcome.TargetState = (int)State.Ignore;
         }
+    }
+
+    [Action(State.Greet)]
+    [Target(State.Finish)]
+    public void Greet(Outcome outcome)
+    {
+        Console.WriteLine("I am in Greet function!");
+        outcome.TargetState = (int)State.Finish;
+    }
+
+    [Action(State.Ignore)]
+    [Target(State.Finish)]
+    public void Ignore(Outcome outcome)
+    {
+        Console.WriteLine("I am in Ignore function!");
+        outcome.TargetState = (int)State.Finish;
     }
 }
