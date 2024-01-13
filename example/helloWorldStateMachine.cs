@@ -29,7 +29,9 @@ public class HelloWorldStateMachine : FiniteStateMachine
     }
 
     // Define the state transition functions
-    private void Start()
+    [Action(State.Start)]
+    [Target(State.Greet, State.Ignore)]
+    public void Start(Outcome outcome)
     {
         Console.WriteLine("I am in start function!");
 
@@ -37,9 +39,11 @@ public class HelloWorldStateMachine : FiniteStateMachine
 
         if (random.Next(0, 100) % 2 == 0)
         {
+            outcome.TargetState = (int)State.Greet;
         }
         else
         {
+            outcome.TargetState = (int)State.Ignore;
         }
     }
 }
