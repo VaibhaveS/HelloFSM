@@ -1,0 +1,14 @@
+C:\Users\vsekar\HelloFSM\bin\Debug\net8.0\HelloFSM.exe
+C:\Users\vsekar\HelloFSM\bin\Debug\net8.0\HelloFSM.deps.json
+C:\Users\vsekar\HelloFSM\bin\Debug\net8.0\HelloFSM.runtimeconfig.json
+C:\Users\vsekar\HelloFSM\bin\Debug\net8.0\HelloFSM.dll
+C:\Users\vsekar\HelloFSM\bin\Debug\net8.0\HelloFSM.pdb
+C:\Users\vsekar\HelloFSM\obj\Debug\net8.0\HelloFSM.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\vsekar\HelloFSM\obj\Debug\net8.0\HelloFSM.AssemblyInfoInputs.cache
+C:\Users\vsekar\HelloFSM\obj\Debug\net8.0\HelloFSM.AssemblyInfo.cs
+C:\Users\vsekar\HelloFSM\obj\Debug\net8.0\HelloFSM.csproj.CoreCompileInputs.cache
+C:\Users\vsekar\HelloFSM\obj\Debug\net8.0\HelloFSM.dll
+C:\Users\vsekar\HelloFSM\obj\Debug\net8.0\refint\HelloFSM.dll
+C:\Users\vsekar\HelloFSM\obj\Debug\net8.0\HelloFSM.pdb
+C:\Users\vsekar\HelloFSM\obj\Debug\net8.0\HelloFSM.genruntimeconfig.cache
+C:\Users\vsekar\HelloFSM\obj\Debug\net8.0\ref\HelloFSM.dll
