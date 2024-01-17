@@ -1,6 +1,7 @@
 using System;
 using FSM.Attributes;
 
+[Table("hello_world")]
 public class HelloWorldStateMachine : FiniteStateMachine
 {
 

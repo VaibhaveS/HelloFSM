@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class Queue<T>
+public class Queue
 {
     private readonly List<(Type stateMachineType, int id)> queue;
 
