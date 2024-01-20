@@ -3,11 +3,11 @@ using FSM.Attributes;
 
 public class FiniteStateMachineMetaData
 {
-    public Dictionary<Enum, List<MethodInfo>> map;
+    public Dictionary<Enum, MethodInfo> transitions;
 
     public FiniteStateMachineMetaData(Type stateMachineType)
     {
-        Dictionary<Enum, List<MethodInfo>> map = new Dictionary<Enum, List<MethodInfo>>();
+        Dictionary<Enum, MethodInfo> map = new Dictionary<Enum, MethodInfo>();
 
         foreach(MethodInfo methodInfo in stateMachineType.GetMethods(BindingFlags.Public)) 
         {
@@ -21,10 +21,10 @@ public class FiniteStateMachineMetaData
             foreach (Enum state in actionAttribute.States)
             {
                 //store the method info for each action state
-                map[state].Add(methodInfo);
+                map[state] = methodInfo;
             }
         }
 
-        this.map = map;
+        this.transitions = map;
     }
 }

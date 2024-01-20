@@ -1,17 +1,12 @@
 using System.Data.SqlClient;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
+using FSM;
 
-public class FiniteStateMachineContext
+public class FiniteStateMachineContext : Hydrate
 {
-    public Queue WorkQueue { get; set; }
-
-    public SqlConnection Connection { get; set; }
-
-    public FiniteStateMachineContext(Queue WorkQueue, SqlConnection Connection)
+    public FiniteStateMachineContext(Queue WorkQueue, SqlConnection Connection) : base(Connection, WorkQueue)
     {
-        this.WorkQueue = WorkQueue;
-        this.Connection = Connection;
     }
 
     public void ProgressStateMachine()
@@ -30,7 +25,7 @@ public class FiniteStateMachineContext
 
         string query = $"SELECT * FROM {tableName} where id = {id}";
 
-        using (SqlCommand command = new SqlCommand(query, Connection))
+        using (SqlCommand command = new SqlCommand(query, connection))
         {
             using (SqlDataReader reader = command.ExecuteReader())
             {
@@ -61,6 +56,12 @@ public class FiniteStateMachineContext
                     }
 
                     // Use the stateMachineObject as needed
+                    FiniteStateMachineMetaData metaData = StateMachineTypeMetaInformation[stateMachineType];
+                    MethodInfo methodInfo = metaData.transitions[(Enum) stateMachineType.GetProperty("State").GetValue(stateMachineObject)];
+
+                    // Invoke the transition method
+                    Outcome actionOutcome = new Outcome();
+                    methodInfo.Invoke(stateMachineObject, [actionOutcome]);
                 }
             }
         }

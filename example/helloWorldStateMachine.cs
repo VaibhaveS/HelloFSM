@@ -12,8 +12,8 @@ public class HelloWorldStateMachine : FiniteStateMachine
     [Property()]
     public int Age { get; set; }
 
-    // Define the states of the FSM
-    private enum State
+    // Define the Statess of the FSM
+    private enum States
     {
         Start,
         Greet,
@@ -28,9 +28,9 @@ public class HelloWorldStateMachine : FiniteStateMachine
         this.Age = Age;
     }
 
-    // Define the state transition functions
-    [Action(State.Start)]
-    [Target(State.Greet, State.Ignore)]
+    // Define the States transition functions
+    [Action(States.Start)]
+    [Target(States.Greet, States.Ignore)]
     public void Start(Outcome outcome)
     {
         Console.WriteLine("I am in start function!");
@@ -39,27 +39,27 @@ public class HelloWorldStateMachine : FiniteStateMachine
 
         if (random.Next(0, 100) % 2 == 0)
         {
-            outcome.TargetState = (int)State.Greet;
+            outcome.TargetState = (int)States.Greet;
         }
         else
         {
-            outcome.TargetState = (int)State.Ignore;
+            outcome.TargetState = (int)States.Ignore;
         }
     }
 
-    [Action(State.Greet)]
-    [Target(State.Finish)]
+    [Action(States.Greet)]
+    [Target(States.Finish)]
     public void Greet(Outcome outcome)
     {
         Console.WriteLine("I am in Greet function!");
-        outcome.TargetState = (int)State.Finish;
+        outcome.TargetState = (int)States.Finish;
     }
 
-    [Action(State.Ignore)]
-    [Target(State.Finish)]
+    [Action(States.Ignore)]
+    [Target(States.Finish)]
     public void Ignore(Outcome outcome)
     {
         Console.WriteLine("I am in Ignore function!");
-        outcome.TargetState = (int)State.Finish;
+        outcome.TargetState = (int)States.Finish;
     }
 }
