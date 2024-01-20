@@ -28,7 +28,7 @@ public class FiniteStateMachineContext
         string tableName = tableAttribute.Name;
         Console.WriteLine(tableName);
 
-        string query = $"SELECT * FROM active_workflows where id = {id}";
+        string query = $"SELECT * FROM {tableName} where id = {id}";
 
         using (SqlCommand command = new SqlCommand(query, Connection))
         {
