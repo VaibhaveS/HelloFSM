@@ -1,7 +1,4 @@
-using System.Data.SqlClient;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
-using FSM;
 using Npgsql;
 
 public class FiniteStateMachineContext : Hydrate
@@ -22,17 +19,15 @@ public class FiniteStateMachineContext : Hydrate
         }
 
         string tableName = tableAttribute.Name;
-        Console.WriteLine(tableName);
-
         string query = $"SELECT * FROM {tableName} where id = {id}";
 
         using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
         {
-            using (NpgsqlDataReader  reader = command.ExecuteReader())
+            using (NpgsqlDataReader reader = command.ExecuteReader())
             {
                 if (reader.Read())
                 {
-                    object? stateMachineObject = Activator.CreateInstance(stateMachineType);
+                    FiniteStateMachine? stateMachineObject = (FiniteStateMachine?)Activator.CreateInstance(stateMachineType);
 
                     if (stateMachineObject is null)
                     {
@@ -51,32 +46,51 @@ public class FiniteStateMachineContext : Hydrate
                             property.SetValue(stateMachineObject, propertyValue);
                         }
                     }
+                    reader.Close();
 
                     // Use the stateMachineObject as needed
                     FiniteStateMachineMetaData metaData = StateMachineTypeMetaInformation[stateMachineType];
-                    MethodInfo methodInfo = metaData.transitions[(Enum) stateMachineType.GetProperty("State").GetValue(stateMachineObject)];
+                    MethodInfo methodInfo = metaData.transitions[(int) stateMachineType.GetProperty("State").GetValue(stateMachineObject)];
 
                     // Invoke the transition method
                     Outcome actionOutcome = new Outcome();
                     methodInfo.Invoke(stateMachineObject, [actionOutcome]);
+
+                    // If the actionOutcome.TargetState is not stable, populate the work queue
+                    if (metaData.transitions.ContainsKey(actionOutcome.TargetState))
+                    {
+                        WorkQueue.Enqueue(stateMachineType, id);
+                    } 
+                    else 
+                    {
+                        // If the state machine is in a final state, remove it from active workflows
+                        query = $"DELETE FROM active_workflows WHERE workflow_id = {id} AND stateMachineType = '{stateMachineType.Name}';";            
+                        using (NpgsqlCommand cmd = new NpgsqlCommand(query, connection))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    // Update the state machine in the database
+                    stateMachineObject.State = actionOutcome.TargetState;
+                    foreach(PropertyInfo propertyInfo in typeof(HelloWorldStateMachine).GetProperties())
+                    {            
+                        if (propertyInfo.PropertyType == typeof(string))
+                        {
+                            query = $"UPDATE {tableName} SET {propertyInfo.Name} = '{propertyInfo.GetValue(stateMachineObject)}' WHERE id = {id};";
+                        }
+                        else
+                        {
+                            query = $"UPDATE {tableName} SET {propertyInfo.Name} = {propertyInfo.GetValue(stateMachineObject)} WHERE id = {id};";
+                        }
+
+                        using (NpgsqlCommand cmd = new NpgsqlCommand(query, connection))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
                 }
             }
-        }
-    }
-
-    private static string ConvertSqlTypeToCSharpType(string typeName)
-    {
-        if (typeName == "String")
-        {
-            return "VARCHAR";
-        }
-        else if (typeName == "Int32")
-        {
-            return "INT";
-        }
-        else
-        {
-            throw new NotSupportedException($"Conversion from C# type '{typeName}' to SQL type is not supported.");
         }
     }
 }

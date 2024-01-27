@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace FSM.Attributes
 {    
     [AttributeUsage(AttributeTargets.Method)]

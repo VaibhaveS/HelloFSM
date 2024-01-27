@@ -3,13 +3,13 @@ using FSM.Attributes;
 
 public class FiniteStateMachineMetaData
 {
-    public Dictionary<Enum, MethodInfo> transitions;
+    public Dictionary<int, MethodInfo> transitions;
 
     public FiniteStateMachineMetaData(Type stateMachineType)
     {
-        Dictionary<Enum, MethodInfo> map = new Dictionary<Enum, MethodInfo>();
+        Dictionary<int, MethodInfo> map = new Dictionary<int, MethodInfo>();
 
-        foreach(MethodInfo methodInfo in stateMachineType.GetMethods(BindingFlags.Public)) 
+        foreach(MethodInfo methodInfo in stateMachineType.GetMethods()) 
         {
             //check if action attribute is present for this method
             ActionAttribute? actionAttribute = (ActionAttribute?) methodInfo.GetCustomAttribute(typeof(ActionAttribute));
@@ -21,7 +21,7 @@ public class FiniteStateMachineMetaData
             foreach (Enum state in actionAttribute.States)
             {
                 //store the method info for each action state
-                map[state] = methodInfo;
+                map[Convert.ToInt32(state)] = methodInfo;
             }
         }
 

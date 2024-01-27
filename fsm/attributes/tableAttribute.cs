@@ -1,5 +1,3 @@
-using System;
-
 namespace FSM.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]

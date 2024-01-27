@@ -1,4 +1,3 @@
-using System;
 using FSM.Attributes;
 
 [Table("hello_world")]
@@ -39,7 +38,8 @@ public class HelloWorldStateMachine : FiniteStateMachine
     [Target(States.Greet, States.Ignore)]
     public void Start(Outcome outcome)
     {
-        Console.WriteLine("I am in start function!");
+        Console.WriteLine("I am in start function, I aged by a year!");
+        this.Age += 1;
 
         Random random = new Random();
 
@@ -57,7 +57,8 @@ public class HelloWorldStateMachine : FiniteStateMachine
     [Target(States.Finish)]
     public void Greet(Outcome outcome)
     {
-        Console.WriteLine("I am in Greet function!");
+        Console.WriteLine("I am in Greet function, I aged by 2 years!");
+        this.Age += 2;
         outcome.TargetState = (int)States.Finish;
     }
 
@@ -65,7 +66,8 @@ public class HelloWorldStateMachine : FiniteStateMachine
     [Target(States.Finish)]
     public void Ignore(Outcome outcome)
     {
-        Console.WriteLine("I am in Ignore function!");
+        Console.WriteLine("I am in Ignore function, I aged by 5 years!");
+        this.Age += 5;
         outcome.TargetState = (int)States.Finish;
     }
 }

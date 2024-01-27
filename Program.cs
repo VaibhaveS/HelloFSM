@@ -21,11 +21,14 @@ public class Program
         connection.Open();
 
         // Hydrate the work queue with active workflows
-        Hydrate hydrate = new Hydrate(connection, workQueue);
-        hydrate.PushActiveWorkflowsToWorkQueue();
-  
         FiniteStateMachineContext finiteStateMachineContext = new FiniteStateMachineContext(workQueue, connection);
-        finiteStateMachineContext.ProgressStateMachine();
+        finiteStateMachineContext.PushActiveWorkflowsToWorkQueue();
+
+        while(isActiveWorkflows(sqlUtils))
+        {
+            finiteStateMachineContext.ProgressStateMachine();
+            Thread.Sleep(5000);
+        }
     }
     
     private static string ConvertCSharpTypeToSqlType(string typeName)
@@ -116,7 +119,30 @@ public class Program
         {
             command.ExecuteNonQuery();
         }
+        
+        connection.Close();
+    }
+
+    private static bool isActiveWorkflows(SqlUtils sqlUtils)
+    {
+        NpgsqlConnection connection = sqlUtils.GetNewConnection();
+        connection.Open();
+
+        string query = "SELECT count(*) FROM active_workflows;";
+        int rows = 0;
+
+        using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
+        {
+            using (NpgsqlDataReader reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    rows = reader.GetInt32(0);
+                }
+            }
+        }
 
         connection.Close();
+        return rows > 0;
     }
 }
