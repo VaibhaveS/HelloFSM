@@ -13,12 +13,18 @@ public class HelloWorldStateMachine : FiniteStateMachine
     public int Age { get; set; }
 
     // Define the Statess of the FSM
-    private enum States
+    public enum States
     {
         Start,
         Greet,
         Ignore,
         Finish
+    }
+
+    // Required to initialize the sta
+    public HelloWorldStateMachine()
+    {
+
     }
 
     // Constructor to initialize the FSM

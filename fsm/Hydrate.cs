@@ -1,11 +1,14 @@
-using System.Data.SqlClient;
+using Npgsql;
 
+// <summary>
+// This class is responsible for hydrating the work queue with active workflows.
+// </summary>
 public class Hydrate
 {
-    public SqlConnection connection { get; set; }
+    public NpgsqlConnection connection { get; set; }
     public Queue WorkQueue { get; set; }
     public Dictionary<Type, FiniteStateMachineMetaData> StateMachineTypeMetaInformation { get; set; }
-    public Hydrate(SqlConnection connection, Queue workQueue)
+    public Hydrate(NpgsqlConnection connection, Queue workQueue)
     {
         this.connection = connection;
         WorkQueue = workQueue;
@@ -16,9 +19,9 @@ public class Hydrate
     {
         string query = "SELECT * FROM active_workflows";
 
-        using (SqlCommand command = new SqlCommand(query, connection))
+        using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
         {
-            using (SqlDataReader reader = command.ExecuteReader())
+            using (NpgsqlDataReader  reader = command.ExecuteReader())
             {
                 while (reader.Read())
                 {

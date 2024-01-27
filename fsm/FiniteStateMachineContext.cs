@@ -2,10 +2,11 @@ using System.Data.SqlClient;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using FSM;
+using Npgsql;
 
 public class FiniteStateMachineContext : Hydrate
 {
-    public FiniteStateMachineContext(Queue WorkQueue, SqlConnection Connection) : base(Connection, WorkQueue)
+    public FiniteStateMachineContext(Queue WorkQueue, NpgsqlConnection Connection) : base(Connection, WorkQueue)
     {
     }
 
@@ -13,11 +14,11 @@ public class FiniteStateMachineContext : Hydrate
     {
         (Type stateMachineType, int id) = WorkQueue.Dequeue();
 
-        TableAttribute? tableAttribute = Attribute.GetCustomAttribute(stateMachineType, typeof(TableAttribute)) as TableAttribute;
+        FSM.Attributes.TableAttribute? tableAttribute = Attribute.GetCustomAttribute(stateMachineType, typeof(FSM.Attributes.TableAttribute)) as FSM.Attributes.TableAttribute;
 
         if (tableAttribute is null)
         {
-            throw new InvalidOperationException("TableAttribute is null.");
+            throw new InvalidOperationException("FSM.Attributes.TableAttribute is null.");
         }
 
         string tableName = tableAttribute.Name;
@@ -25,15 +26,10 @@ public class FiniteStateMachineContext : Hydrate
 
         string query = $"SELECT * FROM {tableName} where id = {id}";
 
-        using (SqlCommand command = new SqlCommand(query, connection))
+        using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
         {
-            using (SqlDataReader reader = command.ExecuteReader())
+            using (NpgsqlDataReader  reader = command.ExecuteReader())
             {
-                if (reader.FieldCount != 1)
-                {
-                    throw new InvalidOperationException("FieldCount is not 1.");
-                }
-
                 if (reader.Read())
                 {
                     object? stateMachineObject = Activator.CreateInstance(stateMachineType);
@@ -48,7 +44,8 @@ public class FiniteStateMachineContext : Hydrate
                         string propertyName = reader.GetName(i);
                         object propertyValue = reader.GetValue(i);
 
-                        PropertyInfo? property = stateMachineType.GetProperty(propertyName);
+                        var x = stateMachineType.GetProperties();
+                        PropertyInfo? property = stateMachineType.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                         if (property != null && property.CanWrite)
                         {
                             property.SetValue(stateMachineObject, propertyValue);
@@ -64,6 +61,22 @@ public class FiniteStateMachineContext : Hydrate
                     methodInfo.Invoke(stateMachineObject, [actionOutcome]);
                 }
             }
+        }
+    }
+
+    private static string ConvertSqlTypeToCSharpType(string typeName)
+    {
+        if (typeName == "String")
+        {
+            return "VARCHAR";
+        }
+        else if (typeName == "Int32")
+        {
+            return "INT";
+        }
+        else
+        {
+            throw new NotSupportedException($"Conversion from C# type '{typeName}' to SQL type is not supported.");
         }
     }
 }
